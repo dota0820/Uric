@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1f6f5c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="尿酸管家">
+  <title>尿酸管家</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="demoBar" class="demo-bar hidden"></div>
+  <header class="top">
+    <h1><span>🩺</span><span id="appName">尿酸管家</span></h1>
+    <div class="tools">
+      <button class="pill" id="fontBtn" aria-label="字体大小">A+</button>
+      <button class="pill" id="langBtn">EN</button>
+    </div>
+  </header>
+
+  <main id="view"></main>
+
+  <nav class="tabs" id="tabs">
+    <a href="#home" data-r="home"><span class="i">🏠</span><span data-t="tabHome"></span></a>
+    <a href="#food" data-r="food"><span class="i">🍜</span><span data-t="tabFood"></span></a>
+    <a href="#report" data-r="report"><span class="i">📄</span><span data-t="tabReport"></span></a>
+    <a href="#chat" data-r="chat"><span class="i">💬</span><span data-t="tabChat"></span></a>
+  </nav>
+
+  <input type="file" id="camFood" accept="image/*" capture="environment" class="hidden">
+  <input type="file" id="pickFood" accept="image/*" class="hidden">
+  <input type="file" id="camReport" accept="image/*" capture="environment" class="hidden">
+  <input type="file" id="pickReport" accept="image/*" class="hidden">
+
+  <script src="content.js"></script>
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

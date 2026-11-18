@@ -1,0 +1,16 @@
+{
+  "name": "uric-care",
+  "version": "0.1.0",
+  "description": "尿酸管家 — 为 50–60 岁马来西亚高尿酸 / 痛风长辈设计的简单网页 App",
+  "main": "server.js",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

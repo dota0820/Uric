@@ -180,3 +180,13 @@ svg.chart { width: 100%; height: auto; display: block; }
 .demo-bar { background: var(--yellow-soft); color: var(--yellow); text-align: center; font-size: .8rem; padding: 6px 12px; font-weight: 700; }
 .hidden { display: none !important; }
 .back { background: none; border: none; color: var(--brand); font-weight: 700; padding: 8px 0; min-height: 48px; font-size: 1rem; }
+
+/* 冷知识 / 书本 */
+a.fact-card { display: block; text-decoration: none; color: inherit; }
+.fact-card .fq { font-weight: 800; font-size: 1.05rem; margin: 0 0 4px; }
+.fact-card .more { margin: 10px 0 0; color: var(--brand); font-weight: 700; }
+.answer { font-size: 1.1rem; font-weight: 800; color: var(--brand); margin-top: 0; }
+.src { font-size: .8rem; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 10px; }
+.mainstream { background: var(--brand-soft); border-radius: 12px; padding: 12px 14px; font-size: .95rem; }
+.seg button { font-size: .9rem; padding: 0 6px; }
+details.k { scroll-margin-top: 90px; }

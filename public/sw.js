@@ -1,5 +1,5 @@
 // 简单的离线缓存：界面和知识内容没网络也能打开（AI 功能仍需网络）
-const CACHE = 'uric-v1';
+const CACHE = 'uric-v2';
 const ASSETS = ['/', '/index.html', '/styles.css', '/app.js', '/i18n.js', '/content.js', '/manifest.json', '/icons/icon.svg'];
 
 self.addEventListener('install', (e) => {

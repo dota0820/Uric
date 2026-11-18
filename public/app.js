@@ -164,8 +164,8 @@
     const s = uaSeries();
     const last = s[s.length - 1];
     const prev = s[s.length - 2];
-    const tips = C(CONTENT.tips);
-    const tip = tips[Math.floor(Date.now() / 864e5) % tips.length];
+    const fIdx = Math.floor(Date.now() / 864e5) % CONTENT.facts.length;
+    const fact = C(CONTENT.facts[fIdx]);
     const w = store.get('water', {});
     const cups = w.date === today() ? w.n : 0;
 
@@ -199,7 +199,12 @@
         <p class="muted small" style="margin:0">${T().waterSub(cups)}</p>
         <div class="cups">${Array.from({ length: 8 }, (_, i) => `<button class="cup ${i < cups ? 'on' : ''}" data-cup="${i + 1}" aria-label="${i + 1}">${i < cups ? '💧' : '🥛'}</button>`).join('')}</div>
       </div>
-      <div class="card"><h2>💡 ${T().tipTitle}</h2><p style="margin:0">${esc(tip)}</p></div>
+      <a class="card fact-card" href="#learn/facts/${fIdx}">
+        <h2>💡 ${T().tipTitle}</h2>
+        <p class="fq">${CONTENT.facts[fIdx].ico} ${esc(fact.q)}</p>
+        <p style="margin:0">${esc(fact.a)}</p>
+        <p class="more">${T().readMore} ›</p>
+      </a>
       <div class="two">
         <button class="big-btn" data-go="learn"><span class="ico">📚</span><b>${T().learn}</b></button>
         <button class="big-btn" data-go="exercise"><span class="ico">🚶</span><b>${T().exercise}</b></button>
@@ -434,18 +439,56 @@
   };
 
   // ---- 知识 / 运动 ----
-  const cardsPage = (items, title) => {
-    view.innerHTML = `${backBtn()}<h2>${title}</h2>` + items.map((it, i) => {
-      const c = C(it);
-      return `<details class="k" ${i === 0 ? 'open' : ''}><summary><span style="font-size:1.6rem">${it.ico}</span>${esc(c.t)}</summary><div class="body">${c.b}
-        <button class="btn ghost" data-sp="${i}">${T().listen}</button></div></details>`;
-    }).join('');
+  const cardsPage = (items, title, openIdx = 0) => {
+    view.innerHTML = `${backBtn()}<h2>${title}</h2>` + cardsHTML(items, openIdx);
+    bindSpeak(items, (c) => c.b);
+  };
+  const cardsHTML = (items, openIdx) => items.map((it, i) => {
+    const c = C(it);
+    return `<details class="k" ${i === openIdx ? 'open' : ''}><summary><span style="font-size:1.6rem">${it.ico}</span>${esc(c.t)}</summary><div class="body">${c.b}
+      <button class="btn ghost" data-sp="${i}">${T().listen}</button></div></details>`;
+  }).join('');
+  function bindSpeak(items, textOf) {
     view.querySelectorAll('[data-sp]').forEach((b) => b.onclick = () => {
-      const tmp = document.createElement('div'); tmp.innerHTML = C(items[Number(b.dataset.sp)]).b;
+      const tmp = document.createElement('div'); tmp.innerHTML = textOf(C(items[Number(b.dataset.sp)]));
       speak(tmp.textContent, b);
     });
+  }
+
+  // 知识页：基础知识 / 冷知识 / 书本精华
+  pages.learn = (arg = 'basics', openArg) => {
+    const tab = ['basics', 'facts', 'book'].includes(arg) ? arg : 'basics';
+    const openIdx = openArg != null ? Number(openArg) : (tab === 'facts' ? -1 : 0);
+    const tabs = [['basics', T().tabBasics], ['facts', T().tabFacts], ['book', T().tabBook]];
+    let body = '';
+    if (tab === 'basics') body = cardsHTML(CONTENT.learn, openIdx);
+    if (tab === 'facts') {
+      body = `<p class="muted small">${T().factsIntro}</p>` + CONTENT.facts.map((it, i) => {
+        const c = C(it);
+        return `<details class="k" id="fact-${i}" ${i === openIdx ? 'open' : ''}><summary><span style="font-size:1.6rem">${it.ico}</span>${esc(c.q)}</summary><div class="body">
+          <p class="answer">${esc(c.a)}</p>
+          <p><b>${T().why}</b><br>${c.why}</p>
+          <p class="src">📖 ${T().source}：${esc(c.src)}</p>
+          <button class="btn ghost" data-sp="${i}">${T().listen}</button></div></details>`;
+      }).join('');
+    }
+    if (tab === 'book') {
+      body = `<div class="note" style="margin-bottom:14px">${C(CONTENT.book.intro)}</div>` + CONTENT.book.points.map((it, i) => {
+        const c = C(it);
+        return `<details class="k" ${i === openIdx ? 'open' : ''}><summary><span style="font-size:1.6rem">${it.ico}</span>${esc(c.t)}</summary><div class="body">
+          <p><b>📕 ${T().bookSays}</b><br>${c.b}</p>
+          <div class="mainstream"><b>🩺 ${T().mainstream}</b><br>${c.m}</div>
+          <button class="btn ghost" data-sp="${i}" style="margin-top:12px">${T().listen}</button></div></details>`;
+      }).join('');
+    }
+    view.innerHTML = `${backBtn()}<h2>📚 ${T().learn}</h2>
+      <div class="seg" style="margin-bottom:16px">${tabs.map(([k, l]) => `<button class="${k === tab ? 'on' : ''}" data-tab="${k}">${l}</button>`).join('')}</div>${body}`;
+    view.querySelectorAll('[data-tab]').forEach((b) => b.onclick = () => { location.replace('#learn/' + b.dataset.tab); });
+    if (tab === 'basics') bindSpeak(CONTENT.learn, (c) => c.b);
+    if (tab === 'facts') bindSpeak(CONTENT.facts, (c) => `${c.q}。${c.a}。${c.why}`);
+    if (tab === 'book') bindSpeak(CONTENT.book.points, (c) => `${c.t}。${c.b}。${T().mainstream}：${c.m}`);
+    if (openArg != null) { const el = document.getElementById(tab === 'facts' ? 'fact-' + openIdx : ''); if (el) setTimeout(() => el.scrollIntoView({ block: 'start' }), 50); }
   };
-  pages.learn = () => cardsPage(CONTENT.learn, `📚 ${T().learn}`);
   pages.exercise = () => cardsPage(CONTENT.exercise, `🚶 ${T().exercise}`);
 
   // ---- 资料 ----
@@ -478,12 +521,13 @@
     stopSpeak();
     const old = $('#composer'); if (old) old.remove();
     const h = location.hash.replace('#', '') || 'home';
-    const [name, arg] = h.split('/');
+    const [name, arg, arg2] = h.split('/');
     document.body.className = 'page-' + name;
     document.querySelectorAll('#tabs a').forEach((a) => a.classList.toggle('on', a.dataset.r === name));
     if (name === 'report' && arg) pages.reportDetail(arg);
+    else if (name === 'learn') pages.learn(arg, arg2);
     else (pages[name] || pages.home)();
-    if (name !== 'chat') window.scrollTo(0, 0);
+    if (name !== 'chat' && !arg2) window.scrollTo(0, 0);
   }
 
   function applyLang() {
